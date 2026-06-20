@@ -13,8 +13,8 @@ function Home() {
   const [bookingModalCarId, setBookingModalCarId] = useState<string | null>(null);
   const [threatLevel, setThreatLevel] = useState<'low' | 'medium' | 'high'>('low');
   
-  // Theme state: defaults to light theme
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  // Theme state: defaults to dark theme
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   // Apply theme to document element
   useEffect(() => {

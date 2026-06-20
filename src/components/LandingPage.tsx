@@ -229,7 +229,7 @@ export function LandingPage({
             <div className="hidden md:flex items-center gap-6">
               {/* Theme Toggle Button */}
               <button
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'dark')}
                 className="p-2.5 rounded-full hover:bg-zinc-155 dark:hover:bg-white/5 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all"
                 title={theme === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}
                 aria-label="Toggle theme"
@@ -314,6 +314,11 @@ export function LandingPage({
 
       {/* Hero Section */}
       <section id="hero" className="relative z-10 min-h-[80vh] flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 border-b border-zinc-200/60 dark:border-white/5">
+      {/* Background Cyber Glow Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,240,255,0.07),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,175,55,0.04),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)]" />
+        
         <div className="mx-auto max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Hero Text */}
           <div className="lg:col-span-6 flex flex-col space-y-6 text-left">

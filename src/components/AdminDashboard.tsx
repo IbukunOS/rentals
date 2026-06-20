@@ -267,8 +267,9 @@ export function AdminDashboard({
               
               <div className="flex items-center gap-2">
                 {/* Theme Selector */}
+                {/* defaults to dark theme */}
                 <button
-                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'dark')}
                   className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-white/5 text-slate-605 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
                   title="Toggle theme"
                   aria-label="Toggle theme"
