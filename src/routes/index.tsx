@@ -12,17 +12,22 @@ function Home() {
   const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
   const [bookingModalCarId, setBookingModalCarId] = useState<string | null>(null);
   const [threatLevel, setThreatLevel] = useState<'low' | 'medium' | 'high'>('low');
+  
+  // Theme state: defaults to light theme
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Shared state for fleet card package selections (driver, security detail)
-  const [selectedPackages, setSelectedPackages] = useState<Record<string, { driver: boolean; security: boolean }>>({
-    'mercedes-s-guard': { driver: true, security: false },
-    'cadillac-escalade': { driver: true, security: true },
-    'rolls-royce-phantom': { driver: true, security: false },
-  });
-
-  // 1. Asset Preloader lifecycle hook
+  // Apply theme to document element
   useEffect(() => {
-    // Preload critical fleet images
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  // Asset Preloader lifecycle hook
+  useEffect(() => {
     const imagesToPreload = [
       '/luxury_armored_sedan.jpg',
       '/luxury_armored_suv.jpg',
@@ -33,17 +38,14 @@ function Home() {
     const handleLoad = () => {
       loadedCount++;
       if (loadedCount === imagesToPreload.length) {
-        // Core assets loaded, trigger fading transition
         triggerFade();
       }
     };
 
-    // Trigger backup timer in case image preloading takes too long or fails
     const backupTimer = setTimeout(() => {
       triggerFade();
-    }, 1500);
+    }, 1200);
 
-    // Preload execution
     imagesToPreload.forEach(src => {
       const img = new Image();
       img.src = src;
@@ -54,7 +56,6 @@ function Home() {
     function triggerFade() {
       clearTimeout(backupTimer);
       setPreloaderState('fading');
-      // Wait for the fade-out CSS animation/transition to finish (500ms)
       const unmountTimer = setTimeout(() => {
         setPreloaderState('done');
       }, 500);
@@ -64,7 +65,7 @@ function Home() {
     return () => clearTimeout(backupTimer);
   }, []);
 
-  // 2. Hash-based client routing to swap between landing & admin seamlessly
+  // Hash-based client routing
   useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash === '#admin') {
@@ -74,7 +75,6 @@ function Home() {
       }
     };
 
-    // Check current hash on mount
     handleHashChange();
 
     window.addEventListener('hashchange', handleHashChange);
@@ -101,21 +101,27 @@ function Home() {
     }));
   };
 
+  // Shared state for package selections
+  const [selectedPackages, setSelectedPackages] = useState<Record<string, { driver: boolean; security: boolean }>>({
+    'mercedes-s-guard': { driver: true, security: false },
+    'cadillac-escalade': { driver: true, security: true },
+    'rolls-royce-phantom': { driver: true, security: false },
+  });
+
   return (
     <>
-      {/* 1. Global Preloader Overlay (display only while assets are loading) */}
+      {/* Global Preloader Overlay */}
       {preloaderState !== 'done' && (
         <div
           id="preloader"
-          className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-brand-obsidian transition-opacity duration-500 flex-wrap ${
+          className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950 transition-opacity duration-500 ${
             preloaderState === 'fading' ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
         >
           <div className="flex flex-col items-center justify-center gap-4 text-center max-w-sm px-6">
             <div className="relative">
-              {/* Radar pulse rings inside preloader */}
-              <span className="absolute -inset-6 rounded-full bg-brand-cyan/15 animate-radar pointer-events-none"></span>
-              <Shield className="h-12 w-12 text-brand-cyan glow-cyan animate-pulse relative z-10" />
+              <span className="absolute -inset-6 rounded-full bg-sky-500/10 animate-radar pointer-events-none"></span>
+              <Shield className="h-12 w-12 text-sky-500 animate-pulse relative z-10" />
             </div>
 
             <div className="space-y-1.5 mt-4">
@@ -123,9 +129,9 @@ function Home() {
                 Aegis Elite Systems
               </h2>
               <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-3 w-3 text-brand-cyan animate-spin" />
-                <span className="font-mono text-[9px] text-brand-cyan tracking-wider uppercase animate-pulse">
-                  Preloading Secure Assets...
+                <Loader2 className="h-3 w-3 text-sky-500 animate-spin" />
+                <span className="font-mono text-[9px] text-sky-400 tracking-wider uppercase animate-pulse">
+                  Preloading Assets...
                 </span>
               </div>
             </div>
@@ -133,7 +139,7 @@ function Home() {
         </div>
       )}
 
-      {/* 2. Page Content: Mounted and entrance animations triggered ONLY after preloader is completely un-rendered */}
+      {/* Page Content */}
       {preloaderState === 'done' && (
         <div className="animate-fade-in-up">
           {currentView === 'landing' ? (
@@ -142,11 +148,15 @@ function Home() {
               onOpenBookingModal={setBookingModalCarId}
               selectedPackages={selectedPackages}
               setSelectedPackages={setSelectedPackages}
+              theme={theme}
+              setTheme={setTheme}
             />
           ) : (
             <AdminDashboard
               onNavigateToLanding={navigateToLanding}
               threatLevel={threatLevel}
+              setTheme={setTheme}
+              theme={theme}
               setThreatLevel={setThreatLevel}
             />
           )}

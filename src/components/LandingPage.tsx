@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { 
   Shield, 
   ShieldCheck, 
-  Award, 
   Star, 
   ArrowRight, 
   Menu, 
   X, 
-  Globe, 
-  Lock, 
-  ChevronRight, 
-  Users, 
-  Key, 
-  Activity, 
   Sliders, 
-  DollarSign, 
-  Check 
+  ChevronDown, 
+  ChevronUp, 
+  Check,
+  Sun,
+  Moon,
+  Users,
+  Lock,
+  Activity,
+  Award
 } from 'lucide-react';
 
 interface Car {
@@ -98,6 +98,8 @@ interface LandingPageProps {
   onOpenBookingModal: (carId: string) => void;
   selectedPackages: Record<string, { driver: boolean; security: boolean }>;
   setSelectedPackages: React.Dispatch<React.SetStateAction<Record<string, { driver: boolean; security: boolean }>>>;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
 export function LandingPage({
@@ -105,9 +107,17 @@ export function LandingPage({
   onOpenBookingModal,
   selectedPackages,
   setSelectedPackages,
+  theme,
+  setTheme,
 }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  
+  // Track which car details card is expanded
+  const [expandedCarId, setExpandedCarId] = useState<string | null>(null);
+
+  // Tabbed system for Security Core
+  const [activeSecurityTab, setActiveSecurityTab] = useState<'drivers' | 'protection' | 'armoring'>('drivers');
 
   const testimonials = [
     {
@@ -161,16 +171,23 @@ export function LandingPage({
   };
 
   return (
-    <div className="relative min-h-screen bg-brand-obsidian text-slate-100 selection:bg-brand-cyan/30 selection:text-brand-cyan">
+    <div className="relative min-h-screen bg-brand-obsidian text-slate-800 dark:text-slate-100 transition-colors duration-300 overflow-hidden">
       
+      {/* Floating Circles Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[8%] left-[-5%] w-80 h-80 rounded-full bg-sky-200/20 dark:bg-sky-900/6 blur-3xl animate-float-1" />
+        <div className="absolute top-[35%] right-[-5%] w-[480px] h-[480px] rounded-full bg-amber-100/15 dark:bg-amber-900/4 blur-3xl animate-float-2" />
+        <div className="absolute bottom-[20%] left-[8%] w-[380px] h-[380px] rounded-full bg-sky-100/15 dark:bg-sky-900/6 blur-3xl animate-float-3" />
+      </div>
+
       {/* Sticky Navigation Bar */}
-      <nav className="sticky top-0 z-40 w-full border-b border-white/5 bg-brand-obsidian/80 backdrop-blur-lg">
+      <nav className="sticky top-0 z-40 w-full border-b border-zinc-200/60 dark:border-white/5 bg-brand-obsidian/85 backdrop-blur-lg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollToSection('hero')}>
-              <Shield className="h-8 w-8 text-brand-cyan glow-cyan" />
-              <span className="font-heading text-xl font-bold tracking-widest uppercase bg-gradient-to-r from-white via-slate-200 to-brand-cyan bg-clip-text text-transparent">
+              <Shield className="h-7 w-7 text-brand-cyan" />
+              <span className="font-heading text-lg font-bold tracking-widest uppercase bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
                 Aegis<span className="text-brand-cyan">Elite</span>
               </span>
             </div>
@@ -179,21 +196,21 @@ export function LandingPage({
             <div className="hidden md:flex items-center gap-8">
               <button 
                 onClick={() => scrollToSection('fleet')} 
-                className="text-sm font-medium tracking-wide text-slate-400 hover:text-brand-cyan transition-colors"
+                className="text-xs font-bold tracking-wider text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
                 THE FLEET
               </button>
               <button 
                 onClick={() => scrollToSection('security-core')} 
-                className="text-sm font-medium tracking-wide text-slate-400 hover:text-brand-cyan transition-colors"
+                className="text-xs font-bold tracking-wider text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
                 SECURITY CORE
               </button>
               <button 
                 onClick={() => scrollToSection('testimonials')} 
-                className="text-sm font-medium tracking-wide text-slate-400 hover:text-brand-cyan transition-colors"
+                className="text-xs font-bold tracking-wider text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
-                TRUST & TESTIMONIALS
+                TESTIMONIALS
               </button>
               <a 
                 href="#admin" 
@@ -201,37 +218,49 @@ export function LandingPage({
                   e.preventDefault();
                   onNavigateToAdmin();
                 }}
-                className="text-sm font-medium tracking-wide text-slate-400 hover:text-brand-cyan transition-colors border-l border-white/10 pl-6 flex items-center gap-1.5"
+                className="text-xs font-bold tracking-wider text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white transition-colors border-l border-zinc-200 dark:border-white/10 pl-6 flex items-center gap-1.5"
               >
-                <Sliders className="h-4 w-4 text-brand-cyan/70" />
+                <Sliders className="h-4.5 w-4.5 text-brand-cyan/70" />
                 ADMIN PANEL
               </a>
             </div>
 
-            {/* Book Now CTA */}
-            <div className="hidden md:flex items-center">
+            {/* Right actions: Theme Selector & Booking CTA */}
+            <div className="hidden md:flex items-center gap-6">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                className="p-2.5 rounded-full hover:bg-zinc-155 dark:hover:bg-white/5 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all"
+                title={theme === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}
+                aria-label="Toggle theme"
+              >
+                {theme === 'light' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5" />}
+              </button>
+
               <button 
                 onClick={() => scrollToSection('fleet')}
-                className="relative overflow-hidden rounded-md bg-gradient-to-r from-brand-cyan-dark to-brand-cyan px-5 py-2.5 text-sm font-semibold tracking-wider text-black shadow-lg shadow-brand-cyan/15 hover:shadow-brand-cyan/25 transition-all duration-300 transform hover:-translate-y-0.5"
+                className="rounded bg-brand-cyan px-5 py-2.5 text-xs font-bold tracking-wider text-slate-900 dark:text-black hover:bg-brand-cyan-dark transition-all duration-300"
               >
-                BOOK SECURE TRANSIT
+                BOOK NOW
               </button>
             </div>
 
             {/* Mobile Menu Toggle Button */}
-            <div className="md:hidden flex items-center gap-4">
-              <button 
-                onClick={onNavigateToAdmin}
-                className="p-2 text-slate-400 hover:text-brand-cyan transition-colors"
-                title="Admin Dashboard"
+            <div className="md:hidden flex items-center gap-3">
+              {/* Theme Toggle (Mobile) */}
+              <button
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                className="p-2 rounded-full text-slate-600 dark:text-slate-400 focus:outline-none"
+                aria-label="Toggle theme"
               >
-                <Sliders className="h-5 w-5" />
+                {theme === 'light' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5" />}
               </button>
+
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-slate-400 hover:text-brand-cyan transition-colors focus:outline-none"
+                className="p-2 text-slate-600 dark:text-slate-400 hover:text-brand-cyan transition-colors focus:outline-none"
               >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </div>
           </div>
@@ -239,24 +268,24 @@ export function LandingPage({
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-x-0 top-20 z-30 border-b border-white/5 bg-brand-obsidian/95 backdrop-blur-xl px-4 py-6 flex flex-col gap-5 animate-fade-in-up">
+          <div className="md:hidden fixed inset-x-0 top-20 z-30 border-b border-zinc-200 dark:border-white/5 bg-brand-obsidian/95 backdrop-blur-xl px-6 py-6 flex flex-col gap-4 animate-fade-in-up">
             <button 
               onClick={() => scrollToSection('fleet')} 
-              className="text-left py-2 font-medium tracking-wide text-slate-300 hover:text-brand-cyan transition-colors border-b border-white/5"
+              className="text-left py-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-brand-cyan border-b border-zinc-100 dark:border-white/5"
             >
               THE FLEET
             </button>
             <button 
               onClick={() => scrollToSection('security-core')} 
-              className="text-left py-2 font-medium tracking-wide text-slate-300 hover:text-brand-cyan transition-colors border-b border-white/5"
+              className="text-left py-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-brand-cyan border-b border-zinc-100 dark:border-white/5"
             >
               SECURITY CORE
             </button>
             <button 
               onClick={() => scrollToSection('testimonials')} 
-              className="text-left py-2 font-medium tracking-wide text-slate-300 hover:text-brand-cyan transition-colors border-b border-white/5"
+              className="text-left py-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-brand-cyan border-b border-zinc-100 dark:border-white/5"
             >
-              TRUST & TESTIMONIALS
+              TESTIMONIALS
             </button>
             <a 
               href="#admin"
@@ -265,9 +294,9 @@ export function LandingPage({
                 setMobileMenuOpen(false);
                 onNavigateToAdmin();
               }}
-              className="py-2 font-medium tracking-wide text-slate-300 hover:text-brand-cyan transition-colors border-b border-white/5 flex items-center gap-2"
+              className="py-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-brand-cyan border-b border-zinc-100 dark:border-white/5 flex items-center gap-2"
             >
-              <Sliders className="h-5 w-5 text-brand-cyan" />
+              <Sliders className="h-4.5 w-4.5 text-brand-cyan" />
               ADMIN DASHBOARD
             </a>
             <button 
@@ -275,7 +304,7 @@ export function LandingPage({
                 setMobileMenuOpen(false);
                 scrollToSection('fleet');
               }}
-              className="mt-2 w-full rounded bg-gradient-to-r from-brand-cyan-dark to-brand-cyan py-3 text-center font-bold tracking-wider text-black shadow-lg shadow-brand-cyan/20"
+              className="mt-2 w-full rounded bg-brand-cyan py-3 text-center text-sm font-bold text-slate-900 dark:text-black"
             >
               BOOK SECURE TRANSIT
             </button>
@@ -284,117 +313,59 @@ export function LandingPage({
       </nav>
 
       {/* Hero Section */}
-      <section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20 px-4 sm:px-6 lg:px-8 border-b border-white/5">
-        {/* Background Cyber Glow Grid */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,240,255,0.07),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,175,55,0.04),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)]" />
-
-        <div className="relative mx-auto max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Hero text content */}
-          <div className="lg:col-span-6 flex flex-col justify-center space-y-6 text-left">
-            
-            {/* Tagline */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-brand-cyan/30 bg-brand-cyan/5 px-4 py-1.5 w-fit">
-              <ShieldCheck className="h-4 w-4 text-brand-cyan" />
-              <span className="text-xs font-semibold tracking-widest text-brand-cyan uppercase">
-                TACTICAL EXECUTIVE MOBILITY
+      <section id="hero" className="relative z-10 min-h-[80vh] flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 border-b border-zinc-200/60 dark:border-white/5">
+        <div className="mx-auto max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Hero Text */}
+          <div className="lg:col-span-6 flex flex-col space-y-6 text-left">
+            <div className="inline-flex items-center gap-2 rounded bg-zinc-100 dark:bg-white/5 px-3 py-1 w-fit">
+              <span className="text-[10px] font-extrabold tracking-widest text-slate-650 dark:text-slate-400 uppercase">
+                EXECUTIVE MOBILITY
               </span>
             </div>
 
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-slate-900 dark:text-white">
               Elite Security.<br/>
-              <span className="bg-gradient-to-r from-brand-cyan via-white to-brand-gold bg-clip-text text-transparent">
-                Uncompromising Luxury.
+              <span className="bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
+                Refined Luxury.
               </span>
             </h1>
 
-            {/* Sub-headline */}
-            <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
-              The pinnacle of armored transport. Secure your transit with customized protective detail packages including military-grade vehicles, professional tactical drivers, and close protection agents.
+            <p className="text-base text-slate-650 dark:text-slate-400 max-w-lg leading-relaxed font-semibold">
+              A bespoke armored fleet tailored for corporate officers, diplomats, and private VIP clients. Secure your transit with customized driver and defense detail configurations.
             </p>
 
-            {/* Specs Badges */}
-            <div className="grid grid-cols-3 gap-4 py-2 border-y border-white/5 max-w-md">
-              <div>
-                <p className="text-2xl font-bold font-heading text-brand-cyan">VR10</p>
-                <p className="text-xxs text-slate-500 uppercase tracking-widest mt-0.5">Max Ballistics</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-heading text-brand-gold">100%</p>
-                <p className="text-xxs text-slate-500 uppercase tracking-widest mt-0.5">Vetted Officers</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-heading text-white">24/7</p>
-                <p className="text-xxs text-slate-500 uppercase tracking-widest mt-0.5">GPS Telemetry</p>
-              </div>
-            </div>
-
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <button 
                 onClick={() => scrollToSection('fleet')}
-                className="group flex items-center justify-center gap-2 rounded-md bg-gradient-to-r from-brand-cyan-dark to-brand-cyan px-8 py-4 text-base font-bold text-black shadow-lg shadow-brand-cyan/15 hover:shadow-brand-cyan/25 transition-all duration-300 transform hover:-translate-y-0.5"
+                className="group flex items-center justify-center gap-2 rounded bg-brand-cyan hover:bg-brand-cyan-dark px-7 py-3.5 text-sm font-bold text-slate-900 dark:text-black transition-all"
               >
-                SELECT VEHICLE
-                <ArrowRight className="h-5 w-5 text-black transition-transform group-hover:translate-x-1" />
+                Explore The Fleet
+                <ArrowRight className="h-4.5 w-4.5 text-slate-900 dark:text-black transition-transform group-hover:translate-x-1" />
               </button>
               
               <button 
                 onClick={() => scrollToSection('security-core')}
-                className="flex items-center justify-center gap-2 rounded-md border border-white/10 bg-white/5 px-8 py-4 text-base font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all"
+                className="flex items-center justify-center gap-2 rounded border border-zinc-300 dark:border-white/10 bg-white/40 dark:bg-transparent hover:bg-zinc-50 dark:hover:bg-white/5 px-7 py-3.5 text-sm font-bold text-slate-800 dark:text-slate-200 transition-all"
               >
-                LEARN PROTOCOLS
+                Security Standards
               </button>
             </div>
           </div>
 
-          {/* Hero Hero Showcase Image Card */}
-          <div className="lg:col-span-6 relative flex justify-center items-center">
-            
-            {/* Decorative background radar lines */}
-            <div className="absolute w-[110%] h-[110%] rounded-full border border-brand-cyan/10 animate-pulse pointer-events-none" />
-            <div className="absolute w-[80%] h-[80%] rounded-full border border-white/5 pointer-events-none" />
-            
-            {/* The main card */}
-            <div className="relative glass-panel rounded-2xl p-4 sm:p-6 w-full max-w-lg border border-white/10 glow-cyan-box/10 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-b from-brand-cyan/10 to-transparent opacity-30 pointer-events-none" />
-              
-              {/* Fleet preview image */}
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-zinc-950/80">
+          {/* Hero Graphic Card */}
+          <div className="lg:col-span-6 flex justify-center items-center">
+            <div className="relative glass-panel rounded-xl p-3 w-full max-w-lg overflow-hidden shadow-lg border border-zinc-200/80 dark:border-white/5 bg-white/70 dark:bg-brand-navy-light">
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-950/80">
                 <img 
                   src="/luxury_armored_suv.jpg" 
-                  alt="Aegis Elite Armored SUV Fleet" 
-                  className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
+                  alt="Aegis Armored SUV" 
+                  className="h-full w-full object-cover object-center opacity-95 dark:opacity-90"
                 />
                 
-                {/* HUD overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-obsidian via-transparent to-transparent" />
-                <div className="absolute top-4 left-4 bg-brand-obsidian/85 backdrop-blur-md border border-brand-cyan/30 rounded px-2.5 py-1 text-[10px] font-mono font-bold tracking-widest text-brand-cyan flex items-center gap-1.5 uppercase">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-cyan"></span>
-                  </span>
-                  LOCKED & ARMORED
-                </div>
-                
-                <div className="absolute bottom-4 right-4 bg-brand-navy/90 backdrop-blur-md border border-white/10 rounded px-3 py-1.5 text-xxs font-mono text-slate-300">
-                  REF ID: <span className="text-white font-bold">BR7-CADILLAC</span>
-                </div>
-              </div>
-
-              {/* Card specs */}
-              <div className="mt-6 flex justify-between items-end">
-                <div>
-                  <h3 className="font-heading text-xl font-bold tracking-wide text-white">Escalade ESV Tactical</h3>
-                  <p className="text-sm text-slate-400 flex items-center gap-1.5 mt-1">
-                    <Shield className="h-4 w-4 text-brand-cyan" /> Heavy Armoring + Private Security Escort Available
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xxs uppercase tracking-wider text-slate-500 font-bold">Standard Base</p>
-                  <p className="text-2xl font-bold font-heading text-brand-cyan">$1,500<span className="text-xs font-normal text-slate-400">/day</span></p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-brand-navy/90 backdrop-blur-md rounded px-2.5 py-1 text-[9px] font-bold tracking-wider text-slate-800 dark:text-slate-200">
+                  REF: ESCALADE TACTICAL
                 </div>
               </div>
             </div>
@@ -402,28 +373,26 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* Fleet & Packages Showcase Section */}
-      <section id="fleet" className="py-24 px-4 sm:px-6 lg:px-8 bg-zinc-950/40 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(14,22,38,0.3),transparent_70%)]" />
-
-        <div className="relative mx-auto max-w-7xl">
+      {/* Fleet Showcase Grid */}
+      <section id="fleet" className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 bg-zinc-50/20 dark:bg-zinc-950/20">
+        <div className="mx-auto max-w-6xl">
           {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-brand-cyan glow-cyan">
-              EXECUTIVE TRANSPORT FLEET
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-brand-cyan">
+              THE AEGIS SHOWCASE
             </h2>
-            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Select Your Class & Security Protocols
+            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Bespoke Armored Fleet
             </p>
-            <div className="w-12 h-1 bg-brand-cyan mx-auto rounded" />
-            <p className="text-slate-400">
-              Customize your protection package per vehicle. Standard rental rates can be augmented with certified tactical drivers and close protection agents. Price updates in real time.
+            <p className="text-sm text-slate-650 dark:text-slate-400 font-semibold">
+              Choose a base vehicle class, then click "Configure Options & Specs" to select protection packages and view technical certifications.
             </p>
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {CARS_DATA.map((car) => {
+              const isExpanded = expandedCarId === car.id;
               const hasDriver = selectedPackages[car.id]?.driver || false;
               const hasSecurity = selectedPackages[car.id]?.security || false;
               const currentTotal = calculateTotal(car.id);
@@ -431,131 +400,123 @@ export function LandingPage({
               return (
                 <div 
                   key={car.id} 
-                  className="glass-panel glass-panel-hover rounded-xl flex flex-col justify-between overflow-hidden group border border-white/5 relative"
+                  className="glass-panel rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-300 border border-zinc-200 dark:border-white/5 relative bg-white/90 dark:bg-brand-navy-light shadow-sm"
                 >
-                  {/* Decorative corner tag for armoring status */}
-                  <div className="absolute top-4 left-4 z-10 bg-brand-obsidian/90 backdrop-blur-md border border-white/10 rounded px-2.5 py-1 text-xxs font-mono font-bold tracking-wider text-slate-300">
-                    {car.specs.armoring.split(' ')[0]} Protection
-                  </div>
-
-                  {/* Car Image container */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-brand-obsidian">
+                  {/* Car Image */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-100 dark:bg-brand-obsidian border-b border-zinc-100 dark:border-white/5">
                     <img 
                       src={car.image} 
                       alt={car.name} 
-                      className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
+                      className="h-full w-full object-cover object-center"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 via-transparent to-transparent" />
                   </div>
 
-                  {/* Car Details */}
-                  <div className="p-6 space-y-6 flex-1 flex flex-col justify-between">
+                  {/* Car Details Summary */}
+                  <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
                     <div>
-                      {/* Name & Type */}
                       <div className="space-y-1">
-                        <p className="text-xs font-semibold tracking-wider text-brand-cyan uppercase">{car.category}</p>
-                        <h3 className="font-heading text-xl font-bold tracking-wide text-white group-hover:text-brand-cyan transition-colors">
+                        <span className="text-[10px] font-bold tracking-widest text-brand-cyan uppercase">{car.category}</span>
+                        <h3 className="font-heading text-lg font-bold text-slate-800 dark:text-white leading-snug">
                           {car.name}
                         </h3>
                       </div>
-
-                      {/* Specs List */}
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-4 border-b border-white/5 text-xxs font-mono text-slate-400 mt-2">
-                        <div className="flex items-center gap-1.5">
-                          <Sliders className="h-3 w-3 text-slate-500" />
-                          <span>Eng: {car.specs.engine}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Activity className="h-3 w-3 text-slate-500" />
-                          <span>Pwr: {car.specs.power}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Shield className="h-3 w-3 text-slate-500" />
-                          <span>Arm: {car.specs.armoring.replace(' Protection', '')}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Users className="h-3 w-3 text-slate-500" />
-                          <span>Cap: {car.specs.seating}</span>
-                        </div>
-                      </div>
-
-                      {/* Armoring Features Bullet Points */}
-                      <ul className="mt-4 space-y-2 text-xs text-slate-400">
-                        {car.features.slice(0, 3).map((feat, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-brand-cyan mt-1">•</span>
-                            <span>{feat}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Premium Add-on Packages */}
-                    <div className="space-y-3 pt-4 border-t border-white/5">
-                      <p className="text-xxs uppercase tracking-widest text-slate-400 font-bold">Customize Packages</p>
                       
-                      {/* Base Pack (Standard) - always active */}
-                      <div className="flex items-center justify-between rounded bg-white/5 px-3 py-2 text-xs">
-                        <span className="text-slate-300 font-medium">Standard Vehicle Rental</span>
-                        <span className="font-mono text-slate-500">Included</span>
+                      <div className="mt-3 flex justify-between items-baseline">
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Base Daily Rate</span>
+                        <span className="text-xl font-bold font-heading text-slate-900 dark:text-white">
+                          ${car.basePrice.toLocaleString()}
+                        </span>
                       </div>
-
-                      {/* Driver Pack Toggle */}
-                      <button
-                        onClick={() => togglePackage(car.id, 'driver')}
-                        className={`w-full flex items-center justify-between rounded border px-3 py-2 text-xs transition-all ${
-                          hasDriver 
-                            ? 'bg-brand-cyan/10 border-brand-cyan/40 text-white' 
-                            : 'bg-transparent border-white/5 text-slate-400 hover:bg-white/5 hover:border-white/10'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={`flex h-4 w-4 items-center justify-center rounded border transition-all ${
-                            hasDriver ? 'bg-brand-cyan border-brand-cyan text-black' : 'border-slate-600'
-                          }`}>
-                            {hasDriver && <Check className="h-3 w-3 stroke-[3]" />}
-                          </div>
-                          <span className="font-medium text-left">Professional Tactical Driver</span>
-                        </div>
-                        <span className={`font-mono text-[10px] ${hasDriver ? 'text-brand-cyan font-bold' : 'text-slate-500'}`}>+$250/day</span>
-                      </button>
-
-                      {/* Security Detail Toggle */}
-                      <button
-                        onClick={() => togglePackage(car.id, 'security')}
-                        className={`w-full flex items-center justify-between rounded border px-3 py-2 text-xs transition-all ${
-                          hasSecurity 
-                            ? 'bg-brand-gold/10 border-brand-gold/40 text-white' 
-                            : 'bg-transparent border-white/5 text-slate-400 hover:bg-white/5 hover:border-white/10'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={`flex h-4 w-4 items-center justify-center rounded border transition-all ${
-                            hasSecurity ? 'bg-brand-gold border-brand-gold text-black' : 'border-slate-600'
-                          }`}>
-                            {hasSecurity && <Check className="h-3 w-3 stroke-[3]" />}
-                          </div>
-                          <span className="font-medium text-left">Executive Security Agent</span>
-                        </div>
-                        <span className={`font-mono text-[10px] ${hasSecurity ? 'text-brand-gold font-bold' : 'text-slate-500'}`}>+$600/day</span>
-                      </button>
                     </div>
 
-                    {/* Pricing & CTA */}
-                    <div className="pt-4 flex items-center justify-between border-t border-white/5">
+                    {/* Expandable Configuration Toggle Trigger */}
+                    <div className="pt-2 border-t border-zinc-150 dark:border-white/5">
+                      <button
+                        onClick={() => setExpandedCarId(isExpanded ? null : car.id)}
+                        className="w-full flex items-center justify-between py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-brand-cyan transition-colors"
+                      >
+                        <span>{isExpanded ? 'Hide Options & Specs' : 'Configure Options & Specs'}</span>
+                        {isExpanded ? <ChevronUp className="h-4.5 w-4.5" /> : <ChevronDown className="h-4.5 w-4.5" />}
+                      </button>
+
+                      {/* Expandable options Panel */}
+                      {isExpanded && (
+                        <div className="pt-4 pb-2 space-y-4 border-t border-zinc-150 dark:border-white/5 mt-2 animate-fade-in-up">
+                          {/* Specs summary block */}
+                          <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-650 dark:text-slate-350 bg-zinc-100/50 dark:bg-white/2 p-2.5 rounded border border-zinc-150 dark:border-transparent">
+                            <div>Eng: {car.specs.engine}</div>
+                            <div>Pwr: {car.specs.power}</div>
+                            <div>Seating: {car.specs.seating}</div>
+                            <div className="text-brand-cyan font-bold truncate">Ballistics: {car.specs.armoring.split(' ')[0]}</div>
+                          </div>
+
+                          {/* Package selection checkboxes */}
+                          <div className="space-y-2">
+                            {/* Standard Rent */}
+                            <div className="flex items-center justify-between rounded bg-zinc-100 dark:bg-white/5 px-2.5 py-2 text-xxs text-slate-700 dark:text-slate-300 border border-zinc-150 dark:border-transparent">
+                              <span>Standard Vehicle Rental</span>
+                              <span className="text-slate-500 dark:text-slate-400 font-mono font-bold">Included</span>
+                            </div>
+
+                            {/* Driver Toggle */}
+                            <button
+                              onClick={() => togglePackage(car.id, 'driver')}
+                              className={`w-full flex items-center justify-between rounded border px-2.5 py-2 text-xxs transition-all ${
+                                hasDriver 
+                                  ? 'bg-brand-cyan/15 border-brand-cyan/40 text-slate-900 dark:text-white font-bold shadow-sm' 
+                                  : 'bg-transparent border-zinc-200 dark:border-white/5 text-slate-650 dark:text-slate-400 hover:bg-zinc-50 dark:hover:bg-white/5'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className={`flex h-4 w-4 items-center justify-center rounded border transition-all ${
+                                  hasDriver ? 'bg-brand-cyan border-brand-cyan text-slate-900 dark:text-black' : 'border-slate-500 dark:border-slate-400'
+                                }`}>
+                                  {hasDriver && <Check className="h-3 w-3 stroke-[3]" />}
+                                </div>
+                                <span className="font-semibold">Tactical Driver</span>
+                              </div>
+                              <span className="font-mono font-bold text-brand-cyan">+$250/day</span>
+                            </button>
+
+                            {/* Security Toggle */}
+                            <button
+                              onClick={() => togglePackage(car.id, 'security')}
+                              className={`w-full flex items-center justify-between rounded border px-2.5 py-2 text-xxs transition-all ${
+                                hasSecurity 
+                                  ? 'bg-brand-gold/15 border-brand-gold/40 text-slate-900 dark:text-white font-bold shadow-sm' 
+                                  : 'bg-transparent border-zinc-200 dark:border-white/5 text-slate-655 dark:text-slate-400 hover:bg-zinc-50 dark:hover:bg-white/5'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className={`flex h-4 w-4 items-center justify-center rounded border transition-all ${
+                                  hasSecurity ? 'bg-brand-gold border-brand-gold text-slate-900 dark:text-black' : 'border-slate-500 dark:border-slate-400'
+                                }`}>
+                                  {hasSecurity && <Check className="h-3 w-3 stroke-[3]" />}
+                                </div>
+                                <span className="font-semibold">Close Security Agent</span>
+                              </div>
+                              <span className="font-mono font-bold text-brand-gold">+$600/day</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Final Totals & Actions */}
+                    <div className="pt-4 flex items-center justify-between border-t border-zinc-150 dark:border-white/5">
                       <div>
-                        <p className="text-xxs uppercase tracking-wider text-slate-500 font-bold">Total Est. Rate</p>
-                        <p className="text-2xl font-bold font-heading text-brand-cyan tracking-wide">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Total Rate</span>
+                        <p className="text-xl font-bold font-heading text-slate-900 dark:text-white tracking-wide">
                           ${currentTotal.toLocaleString()}
-                          <span className="text-xs font-normal text-slate-400">/day</span>
+                          <span className="text-xs font-normal text-slate-500 dark:text-slate-400">/day</span>
                         </p>
                       </div>
                       
                       <button 
                         onClick={() => onOpenBookingModal(car.id)}
-                        className="rounded bg-gradient-to-r from-brand-cyan-dark to-brand-cyan hover:glow-cyan-box px-4 py-2.5 text-xs font-bold tracking-wider text-black transition-all hover:shadow-lg hover:shadow-brand-cyan/20"
+                        className="rounded bg-brand-cyan px-5 py-2.5 text-xs font-bold text-slate-900 dark:text-black hover:bg-brand-cyan-dark transition-all"
                       >
-                        RESERVE NOW
+                        Reserve
                       </button>
                     </div>
                   </div>
@@ -566,154 +527,163 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* The Security & Trust Core Section */}
-      <section id="security-core" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(0,240,255,0.03),transparent_60%)]" />
-
-        <div className="relative mx-auto max-w-7xl">
+      {/* Security Core - Sleek Tabbed Panel */}
+      <section id="security-core" className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 border-t border-zinc-200/60 dark:border-white/5">
+        <div className="relative mx-auto max-w-4xl">
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-brand-cyan glow-cyan">
-              SAFETY & SECURE PROTOCOLS
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-brand-cyan">
+              SECURITY CORE
             </h2>
-            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              The Aegis Protection Guarantee
+            <p className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Aegis Security Operations
             </p>
-            <div className="w-12 h-1 bg-brand-cyan mx-auto rounded" />
-            <p className="text-slate-400">
-              Security is not an add-on; it is our foundation. All security operations are overseen by military and intelligence sector veterans.
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold">
+              We employ strict tactical screening protocols to maintain an elite standard of close-protection service.
             </p>
           </div>
 
-          {/* Grid detailing elements */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Card 1: Drivers */}
-            <div className="glass-panel p-8 rounded-xl border border-white/5 text-left space-y-4 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-brand-cyan to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="h-12 w-12 rounded-lg bg-brand-cyan/10 border border-brand-cyan/25 flex items-center justify-center">
-                <Users className="h-6 w-6 text-brand-cyan" />
-              </div>
-              <h3 className="font-heading text-xl font-bold tracking-wide text-white">Professional Tactical Drivers</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Our drivers are not chauffeurs; they are mobility specialists. All drivers undergo rigorous federal background checks, drug screenings, VIP customer service training, and extensive courses in evasive driving maneuvers.
-              </p>
-              <ul className="space-y-2 pt-2 text-xs font-mono text-slate-400">
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-cyan" />
-                  <span>Certified Defensive Driving Level III</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-cyan" />
-                  <span>Non-Disclosure Agreement Vetted</span>
-                </li>
-              </ul>
+          {/* Interactive tabs */}
+          <div className="flex justify-center border-b border-zinc-200 dark:border-white/5 mb-8">
+            <div className="flex gap-2 sm:gap-6">
+              <button
+                onClick={() => setActiveSecurityTab('drivers')}
+                className={`py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                  activeSecurityTab === 'drivers' 
+                    ? 'border-brand-cyan text-brand-cyan' 
+                    : 'border-transparent text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Tactical Drivers
+              </button>
+              <button
+                onClick={() => setActiveSecurityTab('protection')}
+                className={`py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                  activeSecurityTab === 'protection' 
+                    ? 'border-brand-cyan text-brand-cyan' 
+                    : 'border-transparent text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Armed Protection
+              </button>
+              <button
+                onClick={() => setActiveSecurityTab('armoring')}
+                className={`py-3.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                  activeSecurityTab === 'armoring' 
+                    ? 'border-brand-cyan text-brand-cyan' 
+                    : 'border-transparent text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Armored Vehicles
+              </button>
             </div>
+          </div>
 
-            {/* Card 2: Tactical Security */}
-            <div className="glass-panel p-8 rounded-xl border border-white/5 text-left space-y-4 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-brand-gold to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="h-12 w-12 rounded-lg bg-brand-gold/10 border border-brand-gold/25 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-brand-gold" />
+          {/* Tab content panel */}
+          <div className="glass-panel p-8 rounded-xl border border-zinc-200 dark:border-white/5 text-left min-h-[220px] flex flex-col justify-center animate-fade-in-up bg-white/90 dark:bg-brand-navy-light shadow-sm">
+            {activeSecurityTab === 'drivers' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded bg-brand-cyan/10 border border-brand-cyan/20 flex items-center justify-center text-brand-cyan">
+                    <Users className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-slate-800 dark:text-white">Professional Tactical Chauffeurs</h3>
+                </div>
+                <p className="text-slate-650 dark:text-slate-400 text-sm leading-relaxed font-semibold">
+                  All operators are certified defensive driving specialists, extensively trained in ambush evasion, high-speed vehicle control, and route analytics. Vetted continuously with comprehensive criminal background checks and drug screenings.
+                </p>
+                <div className="flex gap-4 text-xxs font-mono text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-cyan" /> Defensive Certifications</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-cyan" /> Full NDA Vetted</span>
+                </div>
               </div>
-              <h3 className="font-heading text-xl font-bold tracking-wide text-white">Executive Close Protection</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Close protection personnel are drawn exclusively from elite military units, special forces, and municipal tactical policing teams. They are fully trained in threat mitigation, weapon systems, first aid trauma care, and exfiltration protocols.
-              </p>
-              <ul className="space-y-2 pt-2 text-xs font-mono text-slate-400">
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-gold" />
-                  <span>Ex-Special Forces Personnel</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-gold" />
-                  <span>Active Armed License & Trauma Certified</span>
-                </li>
-              </ul>
-            </div>
+            )}
 
-            {/* Card 3: Armoring */}
-            <div className="glass-panel p-8 rounded-xl border border-white/5 text-left space-y-4 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-brand-cyan to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="h-12 w-12 rounded-lg bg-brand-cyan/10 border border-brand-cyan/25 flex items-center justify-center">
-                <Lock className="h-6 w-6 text-brand-cyan" />
+            {activeSecurityTab === 'protection' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                    <Lock className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-slate-800 dark:text-white">Armed Close Protection Officers</h3>
+                </div>
+                <p className="text-slate-650 dark:text-slate-400 text-sm leading-relaxed font-semibold">
+                  Our tactical close protection details are composed of veterans from municipal SWAT teams, military police, and elite units. Experienced in threat mitigation, tactical coordination, and medical trauma response protocols.
+                </p>
+                <div className="flex gap-4 text-xxs font-mono text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-gold" /> Ex-Special Forces</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-gold" /> Combat Trauma Care</span>
+                </div>
               </div>
-              <h3 className="font-heading text-xl font-bold tracking-wide text-white">State-Of-The-Art Armoring</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Our vehicles are engineered to survive extreme scenarios. Built with multi-layered ballistic glass, reinforced armor plating (composites and steel bulkheads), blast-resistant floor paneling, and military-grade run-flat tires.
-              </p>
-              <ul className="space-y-2 pt-2 text-xs font-mono text-slate-400">
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-cyan" />
-                  <span>VR10 / BR7 Armoring Verification</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-brand-cyan" />
-                  <span>Explosive & Blast Overpressure Certified</span>
-                </li>
-              </ul>
-            </div>
+            )}
+
+            {activeSecurityTab === 'armoring' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded bg-brand-cyan/10 border border-brand-cyan/20 flex items-center justify-center text-brand-cyan">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold text-slate-800 dark:text-white">Ballistic & Blast Certified Armoring</h3>
+                </div>
+                <p className="text-slate-650 dark:text-slate-400 text-sm leading-relaxed font-semibold">
+                  Vehicles are armored to VR10 and BR7 ballistic standards. Outfitted with heavy passenger compartment plating, blast-resistant flooring, run-flat tires, reinforced suspension, and custom cabin air filtrations.
+                </p>
+                <div className="flex gap-4 text-xxs font-mono text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-cyan" /> VR10/BR7 Verified</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-brand-cyan" /> Expl. Blast Mitigation</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Testimonials & Social Proof */}
-      <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-zinc-950/40 relative">
-        <div className="relative mx-auto max-w-5xl">
-          {/* Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-brand-cyan glow-cyan">
-              CLIENT TESTIMONIALS
+      {/* Testimonials */}
+      <section id="testimonials" className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 bg-zinc-50/20 dark:bg-zinc-950/20">
+        <div className="relative mx-auto max-w-4xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-brand-cyan">
+              TRUSTED REVIEWS
             </h2>
-            <p className="text-3xl font-extrabold tracking-tight">
-              Trusted by Dignitaries & Corporations
+            <p className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Testimonials
             </p>
-            <div className="w-12 h-1 bg-brand-cyan mx-auto rounded" />
           </div>
 
-          {/* Testimonial slider layout */}
-          <div className="relative glass-panel rounded-2xl p-8 sm:p-12 border border-white/5 overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 font-serif text-8xl text-brand-cyan/5 font-extrabold leading-none select-none pointer-events-none">
-              “
-            </div>
-
+          <div className="relative glass-panel rounded-xl p-8 sm:p-10 border border-zinc-200 dark:border-white/5 overflow-hidden bg-white/95 dark:bg-brand-navy-light text-center sm:text-left shadow-sm">
             <div className="space-y-6">
-              {/* Stars */}
               <div className="flex gap-1 justify-center sm:justify-start">
                 {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-brand-gold text-brand-gold glow-gold" />
+                  <Star key={i} className="h-4 w-4 fill-brand-gold text-brand-gold" />
                 ))}
               </div>
 
-              {/* Review Text */}
-              <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-slate-200">
+              <blockquote className="text-lg font-bold leading-relaxed text-slate-800 dark:text-slate-200">
                 "{testimonials[activeTestimonial].review}"
               </blockquote>
 
-              {/* Client Info */}
-              <div className="flex items-center gap-4 justify-center sm:justify-start pt-4 border-t border-white/5">
-                <div className="h-12 w-12 rounded-full bg-brand-cyan/20 border border-brand-cyan/30 flex items-center justify-center font-heading text-lg font-bold text-brand-cyan">
+              <div className="flex items-center gap-4 justify-center sm:justify-start pt-4 border-t border-zinc-150 dark:border-white/5">
+                <div className="h-10 w-10 rounded-full bg-brand-cyan/20 border border-brand-cyan/30 flex items-center justify-center font-heading text-sm font-bold text-brand-cyan">
                   {testimonials[activeTestimonial].avatar}
                 </div>
                 <div className="text-left">
-                  <p className="font-heading font-bold text-white text-base">
+                  <p className="font-heading font-bold text-slate-800 dark:text-white text-sm">
                     {testimonials[activeTestimonial].name}
                   </p>
-                  <p className="text-xs text-brand-slate tracking-wide">
+                  <p className="text-[10px] text-slate-650 dark:text-slate-400 font-bold uppercase tracking-wider">
                     {testimonials[activeTestimonial].title}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Slider Dots */}
-            <div className="flex justify-center gap-2.5 mt-8">
+            <div className="flex justify-center gap-2 mt-8">
               {testimonials.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveTestimonial(idx)}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    idx === activeTestimonial ? 'w-8 bg-brand-cyan' : 'w-2.5 bg-white/10 hover:bg-white/20'
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === activeTestimonial ? 'w-6 bg-brand-cyan' : 'w-2 bg-zinc-200 dark:bg-white/10 hover:bg-zinc-300 dark:hover:bg-white/20'
                   }`}
                   aria-label={`Go to testimonial ${idx + 1}`}
                 />
@@ -724,63 +694,62 @@ export function LandingPage({
       </section>
 
       {/* Footer */}
-      <footer className="bg-brand-obsidian border-t border-white/5 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="relative z-10 border-t border-zinc-200/60 dark:border-white/5 py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-brand-obsidian">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-8">
           
-          {/* Brand Column */}
-          <div className="space-y-4 text-left">
+          {/* Brand */}
+          <div className="space-y-3 text-left">
             <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-brand-cyan" />
-              <span className="font-heading text-lg font-bold tracking-widest uppercase text-white">
+              <Shield className="h-5 w-5 text-brand-cyan" />
+              <span className="font-heading text-base font-bold tracking-widest uppercase text-slate-800 dark:text-white">
                 Aegis<span className="text-brand-cyan">Elite</span>
               </span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-              Vetted executive protection & armored transport solutions. Securing transit for high-profile clients, diplomats, and corporate officers globally.
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-xs font-semibold">
+              Vetted executive protection & armored transport solutions. Securing transit for high-profile clients globally.
             </p>
-            <div className="text-[10px] font-mono text-slate-500 pt-2">
+            <div className="text-[9px] font-mono text-slate-500 dark:text-slate-400 pt-2">
               EST. 2018 | Aegis Security Group Ltd.
             </div>
           </div>
 
-          {/* Nav Links Column */}
+          {/* Links 1 */}
           <div className="text-left space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">FLEET DETAILS</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
-              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan transition-colors">Armored Sedans</button></li>
-              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan transition-colors">Tactical SUVs</button></li>
-              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan transition-colors">Bespoke Executive Class</button></li>
-              <li><button onClick={() => scrollToSection('security-core')} className="hover:text-brand-cyan transition-colors">Armoring Standards</button></li>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">FLEET DETAILS</h4>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 font-bold">
+              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan">Armored Sedans</button></li>
+              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan">Tactical SUVs</button></li>
+              <li><button onClick={() => scrollToSection('fleet')} className="hover:text-brand-cyan">Bespoke Executive Class</button></li>
+              <li><button onClick={() => scrollToSection('security-core')} className="hover:text-brand-cyan">Armoring Standards</button></li>
             </ul>
           </div>
 
-          {/* Legal / Protection Standards */}
+          {/* Links 2 */}
           <div className="text-left space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">STANDARDS & LEGAL</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
-              <li><a href="#privacy" className="hover:text-brand-cyan transition-colors">Privacy & NDA Assurances</a></li>
-              <li><a href="#licensing" className="hover:text-brand-cyan transition-colors">Armed Protection Licensing</a></li>
-              <li><a href="#liability" className="hover:text-brand-cyan transition-colors">Insurance & Liability Limits</a></li>
-              <li><a href="#carrier" className="hover:text-brand-cyan transition-colors">Air Carrier Terminal Access</a></li>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">STANDARDS & LEGAL</h4>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 font-bold">
+              <li><a href="#privacy" className="hover:text-brand-cyan">Privacy & NDA Assurances</a></li>
+              <li><a href="#licensing" className="hover:text-brand-cyan">Armed Protection Licensing</a></li>
+              <li><a href="#liability" className="hover:text-brand-cyan">Insurance & Liability Limits</a></li>
             </ul>
           </div>
 
-          {/* Newsletter Column */}
+          {/* Newsletter */}
           <div className="text-left space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">SECURITY ALERTS SIGNUP</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Subscribe to global corporate safety newsletters and fleet availability logs.
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">SECURITY NEWS</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">
+              Subscribe to global corporate safety newsletters.
             </p>
             <form onSubmit={(e) => e.preventDefault()} className="flex gap-2 pt-1 max-w-sm">
               <input
                 type="email"
                 placeholder="Secure email"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs focus:outline-none focus:border-brand-cyan/50 text-white placeholder-slate-500"
+                className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3 py-2 text-xs focus:outline-none focus:border-brand-cyan/50 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
               />
               <button
                 type="submit"
-                className="rounded bg-brand-cyan px-4 py-2 text-xs font-bold text-black hover:bg-brand-cyan/90 transition-colors"
+                className="rounded bg-brand-cyan px-4 py-2 text-xs font-bold text-slate-900 dark:text-black hover:bg-brand-cyan-dark transition-colors"
               >
                 SUBMIT
               </button>

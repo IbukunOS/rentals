@@ -6,10 +6,10 @@ import {
   MapPin, 
   User, 
   AlertTriangle, 
-  DollarSign, 
   Loader2, 
   CheckCircle2, 
-  Lock 
+  Lock,
+  Check
 } from 'lucide-react';
 import { CARS_DATA } from './LandingPage';
 
@@ -69,38 +69,36 @@ export function BookingModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName || !clientEmail) {
-      alert('Please complete the client name and email fields.');
+      alert('Please fill out your name and email.');
       return;
     }
     
-    // Trigger loader state
     setBookingState('processing');
 
     setTimeout(() => {
-      // Generate mock reservation ID
       const randNum = Math.floor(10000 + Math.random() * 90000);
       setReservationId(`AEGIS-${randNum}-SEC`);
       setBookingState('confirmed');
-    }, 2000);
+    }, 1800);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-obsidian/85 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 dark:bg-black/60 backdrop-blur-md overflow-y-auto">
       
       {/* Modal Card wrapper */}
-      <div className="relative w-full max-w-4xl glass-panel rounded-2xl border border-white/10 shadow-2xl shadow-black overflow-hidden animate-fade-in-up my-8 text-left">
+      <div className="relative w-full max-w-4xl glass-panel rounded-xl border border-zinc-200 dark:border-white/10 shadow-xl dark:shadow-none overflow-hidden animate-fade-in-up my-8 text-left bg-white dark:bg-brand-navy-light text-slate-800 dark:text-slate-100">
         
         {/* Header */}
-        <div className="bg-brand-navy/60 border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <div className="bg-zinc-50 dark:bg-brand-navy/60 border-b border-zinc-200 dark:border-white/5 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Lock className="h-4 w-4 text-brand-cyan" />
-            <span className="font-heading font-bold text-sm tracking-widest uppercase text-white">SECURE MOBILITY RESERVATION</span>
+            <span className="font-heading font-bold text-xs tracking-widest uppercase text-slate-800 dark:text-white">SECURE MOBILITY RESERVATION</span>
           </div>
           <button 
             onClick={onClose} 
-            className="p-1 rounded hover:bg-white/5 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-white/5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4.5 w-4.5" />
           </button>
         </div>
 
@@ -108,19 +106,19 @@ export function BookingModal({
         {bookingState === 'form' && (
           <form onSubmit={handleSubmit} className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            {/* Left Column: Form Fields (7 cols) */}
+            {/* Left Column: Form Fields */}
             <div className="lg:col-span-7 space-y-6">
               
               <div className="space-y-1">
-                <h3 className="font-heading text-lg font-bold text-white">Client & Protocol Details</h3>
-                <p className="text-xxs text-slate-400 font-mono">ALL FIELDS TRANSMITTED OVER ENCRYPTED CHANNELS</p>
+                <h3 className="font-heading text-lg font-bold text-slate-800 dark:text-white">Client details</h3>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">TRANSMITTED OVER SECURED CHANNELS</p>
               </div>
 
               {/* Client Info Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                    <User className="h-3 w-3 text-slate-500" /> Full Legal Name
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
+                    <User className="h-3.5 w-3.5 text-slate-400" /> Full Legal Name
                   </label>
                   <input
                     type="text"
@@ -128,11 +126,11 @@ export function BookingModal({
                     placeholder="e.g. Senator Marcus Vance"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-600"
+                    className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-400 dark:placeholder-slate-600"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
                     Secure Contact Email
                   </label>
                   <input
@@ -141,68 +139,66 @@ export function BookingModal({
                     placeholder="e.g. vance@senate.gov"
                     value={clientEmail}
                     onChange={(e) => setClientEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-600"
+                    className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-400 dark:placeholder-slate-600"
                   />
                 </div>
               </div>
 
               {/* Route Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-slate-500" /> Primary Pickup / Exfiltration Node
-                  </label>
-                  <select
-                    value={pickupLoc}
-                    onChange={(e) => setPickupLoc(e.target.value)}
-                    className="w-full bg-zinc-900 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50"
-                  >
-                    <option>FBO Private Terminal (Executive)</option>
-                    <option>Ritz Carlton Hotel Lobby</option>
-                    <option>Consular Office HQ</option>
-                    <option>Metro Airport VIP lounge</option>
-                    <option>Corporate Head Office</option>
-                  </select>
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5 text-slate-400" /> Pickup / Destination Node
+                </label>
+                <select
+                  value={pickupLoc}
+                  onChange={(e) => setPickupLoc(e.target.value)}
+                  className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50"
+                >
+                  <option>FBO Private Terminal (Executive)</option>
+                  <option>Ritz Carlton Hotel Lobby</option>
+                  <option>Consular Office HQ</option>
+                  <option>Metro Airport VIP lounge</option>
+                  <option>Corporate Head Office</option>
+                </select>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-slate-500" /> Start Date
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400" /> Start Date
                   </label>
                   <input
                     type="date"
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50"
+                    className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-slate-500" /> End Date
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400" /> End Date
                   </label>
                   <input
                     type="date"
                     required
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50"
+                    className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50"
                   />
                 </div>
               </div>
 
-              {/* Threat Risk Assessment Select */}
+              {/* Threat Risk Assessment */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1">
-                  <AlertTriangle className="h-3.5 w-3.5 text-brand-gold" /> Security Threat Risk Assessment
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1">
+                  <AlertTriangle className="h-3.5 w-3.5 text-brand-gold" /> Security Threat Advisory Level
                 </label>
                 <select
                   value={threatAssessment}
                   onChange={(e) => setThreatAssessment(e.target.value)}
-                  className="w-full bg-zinc-900 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50"
+                  className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50"
                 >
                   <option>Standard VIP (Non-threat executive mobility)</option>
                   <option>Elevated Protection (Public figure, high profile corporate meetings)</option>
@@ -212,38 +208,37 @@ export function BookingModal({
 
               {/* Special instructions */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
-                  Special Convoy / Communications Requirements
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
+                  Special Instructions
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Custom luggage size, dual escort SUV required, secure radio link setup to aircraft"
+                  placeholder="e.g. Custom luggage size, escort specifications..."
                   value={specialInstructions}
                   onChange={(e) => setSpecialInstructions(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-600 resize-none"
+                  className="w-full bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-cyan/50 placeholder-slate-400 dark:placeholder-slate-600 resize-none"
                 />
               </div>
 
             </div>
 
-            {/* Right Column: Invoice Summary & Package selections (5 cols) */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-6 lg:border-l lg:border-white/5 lg:pl-8">
+            {/* Right Column: Invoice Summary */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-6 lg:border-l lg:border-zinc-200 lg:dark:border-white/5 lg:pl-8">
               
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-brand-cyan font-bold">RENTAL VEHICLE SELECTED</p>
-                  <h4 className="font-heading text-lg font-bold text-white leading-tight">{car.name}</h4>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-brand-cyan font-bold">VEHICLE SELECTED</p>
+                  <h4 className="font-heading text-base font-bold text-slate-800 dark:text-white leading-tight">{car.name}</h4>
                   <p className="text-xs text-slate-400">{car.category}</p>
                 </div>
 
-                {/* Micro Image */}
-                <div className="aspect-[16/9] w-full overflow-hidden rounded bg-zinc-950/80">
+                <div className="aspect-[16/9] w-full overflow-hidden rounded bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-white/5">
                   <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
                 </div>
 
-                {/* Sub Package Customizer inside invoice */}
+                {/* Sub Package Toggles */}
                 <div className="space-y-2 pt-2">
-                  <p className="text-xxs font-mono uppercase tracking-wider text-slate-500 font-bold">Adjust Packages</p>
+                  <p className="text-xxs font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Adjust Packages</p>
                   
                   {/* Driver Toggle */}
                   <button
@@ -251,11 +246,11 @@ export function BookingModal({
                     onClick={() => onTogglePackage(car.id, 'driver')}
                     className={`w-full flex items-center justify-between rounded border px-3 py-2 text-xxs transition-all ${
                       hasDriver 
-                        ? 'bg-brand-cyan/5 border-brand-cyan/20 text-white' 
-                        : 'bg-transparent border-white/5 text-slate-500'
+                        ? 'bg-brand-cyan/15 border-brand-cyan/40 text-slate-900 dark:text-white font-bold' 
+                        : 'bg-transparent border-zinc-200 dark:border-white/5 text-slate-400 dark:text-slate-500'
                     }`}
                   >
-                    <span className="font-medium text-left">Professional Tactical Driver</span>
+                    <span>Tactical Driver</span>
                     <span className="font-mono">+$250/day</span>
                   </button>
 
@@ -265,46 +260,45 @@ export function BookingModal({
                     onClick={() => onTogglePackage(car.id, 'security')}
                     className={`w-full flex items-center justify-between rounded border px-3 py-2 text-xxs transition-all ${
                       hasSecurity 
-                        ? 'bg-brand-gold/5 border-brand-gold/20 text-white' 
-                        : 'bg-transparent border-white/5 text-slate-500'
+                        ? 'bg-brand-gold/15 border-brand-gold/40 text-slate-900 dark:text-white font-bold' 
+                        : 'bg-transparent border-zinc-200 dark:border-white/5 text-slate-400 dark:text-slate-500'
                     }`}
                   >
-                    <span className="font-medium text-left">Executive Close Security Agent</span>
+                    <span>Close Security Agent</span>
                     <span className="font-mono">+$600/day</span>
                   </button>
                 </div>
 
-                {/* Costs details breakdown */}
-                <div className="space-y-2 border-t border-white/5 pt-4 text-xs font-mono text-slate-400">
+                {/* Billing details */}
+                <div className="space-y-2 border-t border-zinc-200 dark:border-white/5 pt-4 text-xs font-mono text-slate-500">
                   <div className="flex justify-between">
-                    <span>Base rent ({diffDays} day{diffDays > 1 ? 's' : ''}):</span>
-                    <span className="text-white">${(baseCostPerDay * diffDays).toLocaleString()}</span>
+                    <span>Base Rate ({diffDays} day{diffDays > 1 ? 's' : ''}):</span>
+                    <span className="text-slate-800 dark:text-white font-bold">${(baseCostPerDay * diffDays).toLocaleString()}</span>
                   </div>
                   {hasDriver && (
                     <div className="flex justify-between">
-                      <span>Tactical Driver add-on:</span>
-                      <span className="text-brand-cyan">${(driverCostPerDay * diffDays).toLocaleString()}</span>
+                      <span>Tactical Driver:</span>
+                      <span className="text-brand-cyan font-bold">${(driverCostPerDay * diffDays).toLocaleString()}</span>
                     </div>
                   )}
                   {hasSecurity && (
                     <div className="flex justify-between">
-                      <span>Close Security add-on:</span>
-                      <span className="text-brand-gold">${(securityCostPerDay * diffDays).toLocaleString()}</span>
+                      <span>Close Security:</span>
+                      <span className="text-brand-gold font-bold">${(securityCostPerDay * diffDays).toLocaleString()}</span>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-white/5 pt-2 text-sm font-bold">
-                    <span className="text-slate-300 font-sans">Grand Total:</span>
-                    <span className="text-brand-cyan font-mono">${grandTotal.toLocaleString()}</span>
+                  <div className="flex justify-between border-t border-zinc-200 dark:border-white/5 pt-2 text-xs font-bold text-slate-800 dark:text-white">
+                    <span>Grand Total:</span>
+                    <span className="text-brand-cyan font-mono text-sm">${grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Submit CTA button */}
               <button
                 type="submit"
-                className="w-full rounded bg-gradient-to-r from-brand-cyan-dark to-brand-cyan px-5 py-3 text-center text-sm font-bold tracking-wider text-black shadow-lg shadow-brand-cyan/20 hover:shadow-brand-cyan/35 transition-all"
+                className="w-full rounded bg-brand-cyan px-5 py-3 text-center text-xs font-bold tracking-wider text-slate-900 dark:text-black transition-all"
               >
-                CONFIRM SECURE RESERVATION
+                SUBMIT RESERVATION
               </button>
             </div>
 
@@ -316,10 +310,10 @@ export function BookingModal({
           <div className="p-16 flex flex-col items-center justify-center space-y-4">
             <Loader2 className="h-10 w-10 text-brand-cyan animate-spin" />
             <p className="font-mono text-xs tracking-wider text-brand-cyan uppercase animate-pulse">
-              RUNNING AGENT BIO-BACKGROUND CHECKS...
+              PROCESSING SECURE SYSTEM RESERVATION...
             </p>
             <p className="text-slate-500 text-xxs max-w-sm text-center">
-              Encrypting transaction packet & verifying active tactical schedules.
+              Encrypting transaction details & vetting active driver dispatch grids.
             </p>
           </div>
         )}
@@ -327,44 +321,44 @@ export function BookingModal({
         {/* STATE 3: Confirmation */}
         {bookingState === 'confirmed' && (
           <div className="p-8 sm:p-12 text-center flex flex-col items-center space-y-6 max-w-xl mx-auto">
-            <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 dark:text-emerald-400">
               <CheckCircle2 className="h-10 w-10" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-heading text-2xl font-extrabold tracking-tight text-white">Secure Reservation Confirmed</h3>
-              <p className="text-xs font-mono text-brand-cyan uppercase tracking-widest">TRANSACTION & VETTING CLEARANCE: GRANTED</p>
+              <h3 className="font-heading text-2xl font-extrabold text-slate-800 dark:text-white">Reservation Confirmed</h3>
+              <p className="text-xs font-mono text-brand-cyan uppercase tracking-widest">TRANSACTION CLEARANCE ID: GRANTED</p>
             </div>
 
-            <div className="w-full bg-brand-navy/60 border border-white/5 rounded-lg p-5 font-mono text-xxs text-left space-y-3.5">
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-slate-500">RESERVATION ID</span>
-                <span className="text-white font-bold">{reservationId}</span>
+            <div className="w-full bg-zinc-50 dark:bg-brand-navy/60 border border-zinc-200 dark:border-white/5 rounded-lg p-5 font-mono text-xxs text-slate-600 dark:text-slate-300 space-y-3.5 text-left">
+              <div className="flex justify-between border-b border-zinc-200 dark:border-white/5 pb-2">
+                <span>RESERVATION ID</span>
+                <span className="text-slate-800 dark:text-white font-bold">{reservationId}</span>
               </div>
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-slate-500">ASSIGNED VEHICLE</span>
-                <span className="text-white font-bold">{car.name}</span>
+              <div className="flex justify-between border-b border-zinc-200 dark:border-white/5 pb-2">
+                <span>VEHICLE CLASS</span>
+                <span className="text-slate-800 dark:text-white font-bold">{car.name}</span>
               </div>
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-slate-500">SECURE COMMS ID</span>
-                <span className="text-brand-cyan font-bold">ALPHA-LINK-[{Math.floor(100+Math.random()*900)}]</span>
+              <div className="flex justify-between border-b border-zinc-200 dark:border-white/5 pb-2">
+                <span>COMMS KEY</span>
+                <span className="text-brand-cyan font-bold">LINK-[{Math.floor(100+Math.random()*900)}]</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">ESTIMATED BILLING</span>
+                <span>GRAND TOTAL</span>
                 <span className="text-brand-cyan font-bold">${grandTotal.toLocaleString()} USD</span>
               </div>
             </div>
 
             <div className="space-y-4">
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Your tactical coordinator will contact you via encrypted email shortly to establish safe pickup protocols, secure radio channels, and verify guest details.
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                Our logistics coordinator will reach out via secure channels shortly to confirm flight terminal arrival details, driver contact numbers, and exfiltration protocols.
               </p>
               
               <button
                 onClick={onClose}
-                className="w-full rounded border border-white/10 bg-white/5 px-6 py-2.5 text-xs font-bold text-white hover:bg-white/10 transition-colors"
+                className="w-full rounded border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-6 py-2.5 text-xs font-bold text-slate-700 dark:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-colors"
               >
-                RETURN TO FLEET SHOWCASE
+                Return to Showcase
               </button>
             </div>
           </div>
